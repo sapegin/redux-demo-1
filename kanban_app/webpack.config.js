@@ -7,7 +7,8 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const pkg = require('./package.json');
 
-const TARGET = process.env.npm_lifecycle_event;
+process.env.BABEL_ENV = process.env.NODE_ENV;
+const isProduction = process.env.NODE_ENV === 'production';
 const PATHS = {
   app: path.join(__dirname, 'app'),
   build: path.join(__dirname, 'build'),
@@ -17,8 +18,6 @@ const ENV = {
   host: process.env.HOST || 'localhost',
   port: process.env.PORT || 8080
 };
-
-process.env.BABEL_ENV = TARGET;
 
 const common = {
   entry: {
@@ -58,7 +57,7 @@ const common = {
   ]
 };
 
-if(TARGET === 'start' || !TARGET) {
+if(!isProduction) {
   module.exports = merge(common, {
     entry: {
       style: PATHS.style
@@ -100,7 +99,7 @@ if(TARGET === 'start' || !TARGET) {
   });
 }
 
-if(TARGET === 'build' || TARGET === 'stats') {
+if(isProduction) {
   module.exports = merge(common, {
     entry: {
       vendor: Object.keys(pkg.dependencies).filter(function(v) {
